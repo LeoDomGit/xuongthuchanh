@@ -53,7 +53,7 @@ class CategoriesController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|unique:categories,name',
-            'id_parent'=>'exists:categories,id'
+            'id_parent'=>'nullable|exists:categories,id'
         ], [
             'name.required' => 'Chưa nhận được loại tài khoản',
             'name.unique' => 'Loại tài khoản bị trùng',
@@ -62,7 +62,7 @@ class CategoriesController extends Controller
             return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
         }
         $data = $request->all();
-        $data['id_user']=Auth::id();
+        $data['id_user']=Auth::user()->id;
         $data['slug']= Str::slug($request->name);
         Categories::create($data);
         $categories= Categories::where('id_user',Auth::id())->get();
@@ -92,7 +92,7 @@ class CategoriesController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'unique:categories,name',
-            'id_parent'=>'exists:categories,id'
+            'id_parent'=>'nullable|exists:categories,id'
         ], [
             'name.required' => 'Chưa nhận được loại tài khoản',
             'name.unique' => 'Loại tài khoản bị trùng',

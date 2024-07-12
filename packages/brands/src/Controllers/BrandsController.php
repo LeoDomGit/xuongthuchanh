@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class BrandsController extends Controller
 {
@@ -17,7 +18,7 @@ class BrandsController extends Controller
      */
     public function index()
     {
-        $brands= Brands::all();
+        $brands= Brands::where('id_user',Auth::id())->get();
         return Inertia::render("Brands/Index",['brands'=>$brands]);
     }
 
@@ -33,7 +34,7 @@ class BrandsController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|unique:brands,name',
-          
+            
         ], [
             'name.required' => 'Chưa nhận được thương hiệu',
             'name.unique' => 'Thương hiệu bị trùng',
@@ -42,6 +43,7 @@ class BrandsController extends Controller
             return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
         }
         $data = $request->all();
+        $data['id_user']=Auth::id();
         $data['slug']= Str::slug($request->name);
         Brands::create($data);
         $brands= Brands::all();
@@ -87,7 +89,7 @@ class BrandsController extends Controller
         if($request->has('name')){
             $data['slug']= Str::slug($request->name);
         }
-        Brands::where('id',$id)->update($data);
+        Brands::where('id',$id)->where('id_user',Auth::id())->update($data);
         $brands=Brands::all();
         return response()->json(['check'=> true,'data'=> $brands]);
 

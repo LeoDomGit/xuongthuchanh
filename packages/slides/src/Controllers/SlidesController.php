@@ -98,12 +98,23 @@ class SlidesController
      * Update the specified resource in storage.
      */
     public function api_index(Request $request){
-
+        $validator = Validator::make($request->all(), [
+            'id_user' => 'required|exists:users,id',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
+        }
         $result = Slides::active()->where('id_user',$request->id_user)->get();
         return response()->json($result);
     }
 
     public function api_single(Request $request,$slug){
+        $validator = Validator::make($request->all(), [
+            'id_user' => 'required|exists:users,id',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
+        }
         $result = Slides::active()->where('id_user',$request->id_user)->where('slug',$slug)->get();
         return response()->json($result);
     }

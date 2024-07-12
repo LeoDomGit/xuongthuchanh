@@ -19,13 +19,27 @@ class CategoriesController extends Controller
         $categories= Categories::where('id_user',Auth::id())->get();
         return Inertia::render("Categories/Index",['categories'=>$categories]);
     }
-    public function api_index(Categories $categories)
+
+    public function api_index(Categories $categories,Request $request)
     {
-        return response()->json(Categories::active()->orderBy('id','asc')->get());
+        $validator = Validator::make($request->all(), [
+            'id_user' => 'required|exists:users,id',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
+        }
+        return response()->json(Categories::active()->where('id_user',$request->id_user)->orderBy('id','asc')->get());
     }
-    public function api_show(Categories $categories, $id)
+
+    public function api_show(Categories $categories, $id,Request $request)
     {
-        return response()->json(Categories::active()->where('slug',$id)->with('products.gallery')->get());
+        $validator = Validator::make($request->all(), [
+            'id_user' => 'required|exists:users,id',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
+        }
+        return response()->json(Categories::active()->where('id_user',$request->id_user)->where('slug',$id)->with('products.gallery')->get());
     }
     public function create()
     {

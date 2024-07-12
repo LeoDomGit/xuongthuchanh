@@ -51,7 +51,7 @@ class CategoriesController extends Controller
         $data['id_user']=Auth::id();
         $data['slug']= Str::slug($request->name);
         Categories::create($data);
-        $categories= Categories::all();
+        $categories= Categories::where('id_user',Auth::id())->get();
         return response()->json(['check'=> true,'data'=> $categories]);
     }
 
@@ -91,7 +91,7 @@ class CategoriesController extends Controller
             $data['slug']= Str::slug($request->name);
         }
         Categories::where('id',$id)->where('id_user',Auth::id())->update($data);
-        $categories=Categories::all();
+        $categories=Categories::where('id_user',Auth::id())->get();
         return response()->json(['check'=> true,'data'=> $categories]);
 
     }
@@ -106,7 +106,7 @@ class CategoriesController extends Controller
             return response()->json(['check'=> true,'msg'=>'Không tìm được loại sản phẩm']);
         }
         $category->delete();
-        $categories=Categories::all();
+        $categories=Categories::where('id_user',Auth::id())->get();
         return response()->json(['check'=> true,'data'=> $categories]);
     }
 }

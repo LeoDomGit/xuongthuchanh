@@ -67,7 +67,7 @@ class SlidesController
             'slug' => str::slug($request->name),
             'url' => $request->url, 
             'desktop' => $desktop_file_name,
-            'id_user'=>Auth::id(),
+            'id_user'=>Auth::user()->id,
             'mobile' => $mobile_file_name,
             'created_at' => now()
         ]);

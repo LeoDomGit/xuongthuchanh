@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-
+use Illuminate\Support\Facades\Auth;
 class CategoriesController extends Controller
 {
     /**
@@ -16,7 +16,7 @@ class CategoriesController extends Controller
      */
     public function index()
     {
-        $categories= Categories::all();
+        $categories= Categories::where('id_user',Auth::id())->get();
         return Inertia::render("Categories/Index",['categories'=>$categories]);
     }
     public function api_index(Categories $categories)
@@ -48,6 +48,7 @@ class CategoriesController extends Controller
             return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
         }
         $data = $request->all();
+        $data['id_user']=Auth::id();
         $data['slug']= Str::slug($request->name);
         Categories::create($data);
         $categories= Categories::all();
@@ -89,7 +90,7 @@ class CategoriesController extends Controller
         if($request->has('name')){
             $data['slug']= Str::slug($request->name);
         }
-        Categories::where('id',$id)->update($data);
+        Categories::where('id',$id)->where('id_user',Auth::id())->update($data);
         $categories=Categories::all();
         return response()->json(['check'=> true,'data'=> $categories]);
 

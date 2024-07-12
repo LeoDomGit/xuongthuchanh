@@ -9,6 +9,7 @@ use Leo\Carts\Models\Carts;
 use Inertia\Inertia;
 use Leo\Bills\Models\Bill_Detail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class BillsController extends Controller
 {
@@ -18,6 +19,7 @@ class BillsController extends Controller
     public function index()
     {
         $bills = Bills::with(['details.product'])
+        ->where('id_user',Auth::id())
         ->get()
         ->map(function ($bill) {
             $total = $bill->details->reduce(function ($carry, $detail) {
@@ -50,6 +52,7 @@ class BillsController extends Controller
             'email' => 'required|email',
             'phone' => 'required',
             'address' => 'required',
+            'id_user'=>'required|exists:users,id',
             'cart'=>'required|array',
         ]);
         if ($validator->fails()) {
@@ -60,6 +63,7 @@ class BillsController extends Controller
         $data['email']=$request->email;
         $data['phone']=$request->phone;
         $data['address']=$request->address;
+        $data['id_user']=$request->id_user;
         $id_hoa_don = Bills::insertGetId($data);
         foreach ($request->cart as $key => $item) {
             Bill_Detail::create(['id_hoa_don'=>$id_hoa_don,'id_product'=>$item[0],'quantity'=>$item[1]]);
@@ -74,6 +78,7 @@ class BillsController extends Controller
             'email' => 'required|email',
             'phone' => 'required',
             'address' => 'required',
+            'id_user'=>'required|exists:users,id',
             'id_customer'=>'required|exists:customers,id',
         ]);
         if ($validator->fails()) {
@@ -83,6 +88,7 @@ class BillsController extends Controller
         $data['name']=$request->name;
         $data['email']=$request->email;
         $data['phone']=$request->phone;
+        $data['id_user']=$request->id_user;
         $data['address']=$request->address;
         $id_hoa_don = Bills::insertGetId($data);
         $cart= Carts::where('id_customer',$request->id_customer)

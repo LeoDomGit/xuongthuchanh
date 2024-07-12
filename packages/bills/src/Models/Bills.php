@@ -10,7 +10,7 @@ class Bills extends Model
     use HasFactory;
     protected $table='hoa_don';
     protected $fillable=[
-        'id','name','phone','address','note','status','created_at','updated_at'
+        'id','name','phone','address','note','id_user','status','created_at','updated_at'
     ];
     public function details()
     {

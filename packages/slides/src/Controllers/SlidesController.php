@@ -25,7 +25,7 @@ class SlidesController
 
     public function index()
     {
-        $slides=Slides::select('id','name','desktop','mobile','slug','url','status','created_at')->get();
+        $slides=Slides::where('id_user',Auth::id())->select('id','name','desktop','mobile','slug','url','status','created_at')->get();
         return Inertia::render('Slides/Index',['dataSlides'=>$slides]);
     }
 
@@ -64,13 +64,14 @@ class SlidesController
         $slide = Slides::create([
             'name' => $request->name,
             'slug' => str::slug($request->name),
-            'url' => $request->url, // Store the URL if present
+            'url' => $request->url, 
             'desktop' => $desktop_file_name,
+            'id_user'=>Auth::id(),
             'mobile' => $mobile_file_name,
             'created_at' => now()
         ]);
     
-        $slides = Slides::select('id','name', 'slug', 'url', 'status', 'created_at')->get();
+        $slides = Slides::where('id_user',Auth::id())->select('id','name', 'slug', 'url', 'status', 'created_at')->get();
     
         return response()->json(['check' => true, 'data' => $slides]);
     }
@@ -81,7 +82,7 @@ class SlidesController
     public function show(Slides $slides,$id)
     {
         
-        $slide=Slides::where('id',$id)->first();
+        $slide=Slides::where('id_user',Auth::id())->where('id',$id)->first();
         return response()->json(['slide'=>$slide]);
     }
 
@@ -96,13 +97,14 @@ class SlidesController
     /**
      * Update the specified resource in storage.
      */
-    public function api_index(){
-        $result = Slides::active()->get();
+    public function api_index(Request $request){
+
+        $result = Slides::active()->where('id_user',$request->id_user)->get();
         return response()->json($result);
     }
 
-    public function api_single($slug){
-        $result = Slides::active()->where('slug',$slug)->get();
+    public function api_single(Request $request,$slug){
+        $result = Slides::active()->where('id_user',$request->id_user)->where('slug',$slug)->get();
         return response()->json($result);
     }
 
